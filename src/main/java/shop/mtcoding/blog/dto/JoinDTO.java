@@ -5,6 +5,7 @@ import lombok.Setter;
 
 /*
  * 프엔이거봐
+ * 회원가입 API
  * 1. URL : http://localhost:8080/join
  * 2. method : POST
  * 3. 요청body(request body) : username=값(String)&password=값(String)&email=값(String)
