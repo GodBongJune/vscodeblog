@@ -6,8 +6,9 @@
         <div class="card-body">
             <form action="/join" method="post" enctype="application/x-www-form-urlencoded">
                 <div class="mb-3 mt-3">
-                    <input type="text" class="form-control" placeholder="Enter username" name="username" required
-                        maxlength="20">
+                    <input type="text" id="username" class="form-control" placeholder="Enter username" name="username"
+                        required maxlength="20">
+                    <button type="button" onclick="check()">중복체크</button>
                 </div>
                 <div class="mb-3">
                     <input type="password" class="form-control" placeholder="Enter password" name="password" required
@@ -22,6 +23,26 @@
         </div>
     </div>
 </div>
+<script>
+    async function check() {
+        //1.DOM으로부터 값 가져오기
+        let username = document.querySelector("#username").value;
+        console.log("유저네임", username);
+        //2.통신하기
+        let response = await fetch(`/check?username=${username}`);
+        //3.파싱하기
+        let responseBody = await response.text();
+        console.log(response);
 
+        //4.상태코드확인
+        if (response.status == 200) {
+            alert(responseBody);
+        } else {
+            alert(responseBody);
+        }
+        //5.비즈니스로직
+        btnJoin.classList.add("disabled");
+    }
+</script>
 
 {{> /layout/footer}}

@@ -1,12 +1,16 @@
 package shop.mtcoding.blog.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
@@ -20,6 +24,16 @@ public class UserController {
 
     @Autowired
     private HttpSession session; // request는 가방 session은 서랍
+
+    @ResponseBody
+    @GetMapping("/check")
+    public ResponseEntity<String> check(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            return new ResponseEntity<String>("유저네임이 중복 되었습니다.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("유저네임을 사용할 수 있습니다.", HttpStatus.OK);
+    }
 
     @PostMapping("/login")
     public String login(LoginDTO loginDTO) {
@@ -55,14 +69,12 @@ public class UserController {
         }
 
         // DB에 username이 있는지 체크해보기
-        try {
-            userRepository.findByUsername(joinDTO.getUsername());
+        User user = userRepository.findByUsername(joinDTO.getUsername());
+        if (user != null) {
             return "redirect:/50x";
-        } catch (Exception e) {
-            userRepository.save(joinDTO);
-            return "redirect:/50x";
-
         }
+        userRepository.save(joinDTO); // 핵심 기능
+        return "redirect:/loginForm";
     }
 
     @GetMapping("/loginForm")

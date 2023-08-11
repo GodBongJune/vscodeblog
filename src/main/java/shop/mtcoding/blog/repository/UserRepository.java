@@ -17,9 +17,14 @@ public class UserRepository {
     private EntityManager em;
 
     public User findByUsername(String username) {
-        Query query = em.createNativeQuery("select * from user_tb where username = :username", User.class);
-        query.setParameter("username", username);
-        return (User) query.getSingleResult();
+        try {
+            Query query = em.createNativeQuery("select * from user_tb where username = :username", User.class);
+            query.setParameter("username", username);
+            return (User) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     public User findByUsernameOrPassword(LoginDTO loginDTO) {
@@ -34,6 +39,7 @@ public class UserRepository {
     public void save(JoinDTO joinDTO) {
         Query query = em
                 .createNativeQuery("insert into user_tb(username,password,email) values(:username,:password,:email)");
+
         query.setParameter("username", joinDTO.getUsername());
         query.setParameter("password", joinDTO.getPassword());
         query.setParameter("email", joinDTO.getEmail());
