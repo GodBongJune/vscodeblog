@@ -53,13 +53,16 @@ public class UserController {
         if (joinDTO.getEmail() == null || joinDTO.getEmail().isEmpty()) {
             return "redirect:/40x";
         }
+
+        // DB에 username이 있는지 체크해보기
         try {
-            userRepository.save(joinDTO);
+            userRepository.findByUsername(joinDTO.getUsername());
+            return "redirect:/50x";
         } catch (Exception e) {
+            userRepository.save(joinDTO);
             return "redirect:/50x";
 
         }
-        return "redirect:/loginForm";
     }
 
     @GetMapping("/loginForm")
