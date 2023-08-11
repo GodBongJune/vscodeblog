@@ -1,13 +1,19 @@
 package shop.mtcoding.blog.controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.mtcoding.blog.dto.WriteDTO;
+import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.BoardRepository;
 
@@ -20,8 +26,45 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
+    @PostMapping("/board/{id}/delete")
+    public String delete(@PathVariable Integer id) {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/loginForm";
+        }
+
+        Board board = boardRepository.findById(id);
+        if (board.getUser().getId() != sessionUser.getId()) {
+            return "redirect:/40x";
+        }
+
+        boardRepository.deleteById(id);
+
+        return "redirect:/";
+    }
+
     @GetMapping({ "/", "/board" })
-    public String index() {
+    public String index(@RequestParam(defaultValue = "0") Integer page, HttpServletRequest request) {
+        // 유효성 필요x
+        // 인증검사 필요x
+        List<Board> boardList = boardRepository.findAll(page);
+        int totalCount = boardRepository.count();
+        int totalPage = totalCount / 3;
+        if (totalCount % 3 > 0) {
+            totalPage = totalPage + 1;
+        }
+        boolean last = totalPage - 1 == page;
+        // System.out.println("테스트 :" + boardList.size());
+        // System.out.println("테스트 :" + boardList.get(0).getTitle());
+
+        // 모든언어든 request에 담는다
+        request.setAttribute("boardList", boardList);
+        request.setAttribute("prevPage", page - 1);
+        request.setAttribute("nextPage", page + 1);
+        request.setAttribute("first", page == 0 ? true : false);
+        request.setAttribute("last", last);
+        request.setAttribute("totalCount", totalCount);
+        request.setAttribute("totalPage", totalPage);
         return "index";
     }
 
@@ -51,5 +94,20 @@ public class BoardController {
             return "redirect:/loginForm";
         }
         return "board/saveForm";
+    }
+
+    @GetMapping("/board/{id}")
+    public String detail(@PathVariable Integer id, HttpServletRequest request) {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        Board board = boardRepository.findById(id);
+
+        boolean pageOwner = false;
+        if (sessionUser != null) {
+            pageOwner = sessionUser.getId() == board.getUser().getId();
+        }
+
+        request.setAttribute("board", board);
+        request.setAttribute("pageOwner", pageOwner);
+        return "/board/detail";
     }
 }
