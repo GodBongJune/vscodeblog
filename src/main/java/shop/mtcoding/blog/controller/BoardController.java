@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
@@ -25,6 +26,25 @@ public class BoardController {
 
     @Autowired
     private BoardRepository boardRepository;
+
+    @PostMapping("/board/{id}/update")
+    public String update(@PathVariable Integer id, UpdateDTO updateDTO) {
+        // 1.인증검사
+        // 2.권한체크
+        // 3.핵심로직
+        boardRepository.update(updateDTO, id);
+        return "redirect:/board/" + id;
+    }
+
+    @GetMapping("/board/{id}/updateForm")
+    public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
+        // 1.인증검사
+        // 2.권한체크
+        // 3.핵심로직
+        Board board = boardRepository.findById(id);
+        request.setAttribute("board", board);
+        return "board/updateForm";
+    }
 
     @PostMapping("/board/{id}/delete")
     public String delete(@PathVariable Integer id) {
