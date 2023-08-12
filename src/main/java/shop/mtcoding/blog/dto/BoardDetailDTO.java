@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class BoardDetailDTO {
     private Integer boardId;
     private String boardContent;
@@ -16,9 +16,10 @@ public class BoardDetailDTO {
     private String replyComment;
     private Integer replyUserId;
     private String replyUserUsername;
+    private boolean replyOwner;
 
     public BoardDetailDTO(Integer boardId, String boardContent, String boardTitle, Integer boardUserId, Integer replyId,
-            String replyComment, Integer replyUserId, String replyUserUsername) {
+            String replyComment, Integer replyUserId, String replyUserUsername, boolean replyOwner) {
         this.boardId = boardId;
         this.boardContent = boardContent;
         this.boardTitle = boardTitle;
@@ -27,6 +28,7 @@ public class BoardDetailDTO {
         this.replyComment = replyComment;
         this.replyUserId = replyUserId;
         this.replyUserUsername = replyUserUsername;
+        this.replyOwner = replyOwner;
     }
 
 }
