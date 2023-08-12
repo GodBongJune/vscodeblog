@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-header"><b>정보수정을 해주세요</b></div>
         <div class="card-body">
-            <form action="/updateForm" method="post" enctype="application/x-www-form-urlencoded">
+            <form action="/user/{{user.id}}/update" method="post" enctype="application/x-www-form-urlencoded">
                 <div class="mb-3 mt-3">
                     <input value="{{user.username}}" type="text" class="form-control" placeholder="Enter username"
                         name="username" disabled>

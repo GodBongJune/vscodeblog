@@ -9,10 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.UserRepository;
 
@@ -53,7 +55,7 @@ public class UserController {
             User user = userRepository.findByUsername(loginDTO.getUsername());
             boolean isValid = BCrypt.checkpw(loginDTO.getPassword(), user.getPassword());
             if (isValid) {
-                session.setAttribute("sessionuser", user);
+                session.setAttribute("sessionUser", user);
                 return "redirect:/";
             } else {
                 return "redirect:/loginForm";
@@ -92,6 +94,23 @@ public class UserController {
         return "redirect:/loginForm";
     }
 
+    @PostMapping("/user/{id}/update")
+    public String update(@PathVariable Integer id, UserUpdateDTO userUpdateDTO) {
+        // 1.인증검사
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/loginForm";
+        }
+        // 2.권한체크
+        User user = userRepository.findById(id);
+        if (user.getId() != sessionUser.getId()) {
+            return "redirect:/40x";
+        }
+        // 3.핵심로직
+        userRepository.update(userUpdateDTO, id);
+        return "redirect:/loginForm";
+    }
+
     // ip주소 부여 : 10.5.9.200:8080 -> mtcoding.com:8080
     // localhost, 127.0.0.1
     // a태그 form태그 method=get
@@ -108,7 +127,7 @@ public class UserController {
         return "user/loginForm";
     }
 
-    @GetMapping("/user/updateForm")
+    @GetMapping("/user/{id}/updateForm")
     public String updateForm(HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {

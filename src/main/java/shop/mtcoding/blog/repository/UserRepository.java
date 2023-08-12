@@ -3,12 +3,14 @@ package shop.mtcoding.blog.repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
 import shop.mtcoding.blog.model.User;
 
 // BoardController, UserController, UserRepository
@@ -18,6 +20,15 @@ public class UserRepository {
 
     @Autowired
     private EntityManager em;
+
+    @Transactional
+    public void update(UserUpdateDTO userUpdateDTO, Integer id) {
+        Query query = em.createNativeQuery("update user_tb set password=:password where id = :id");
+        query.setParameter("id", id);
+        String encPassword = BCrypt.hashpw(userUpdateDTO.getPassword(), BCrypt.gensalt());
+        query.setParameter("password", encPassword);
+        query.executeUpdate();
+    }
 
     public User findByUsername(String username) {
         try {
@@ -53,4 +64,12 @@ public class UserRepository {
         query.executeUpdate(); // 쿼리를 전송 (DBMS)
         System.out.println("테스트 :" + 4);
     }
+
+    public User findById(Integer id) {
+        Query query = em.createNativeQuery("select * from user_tb where id = :id", User.class);
+        query.setParameter("id", id);
+        User user = (User) query.getSingleResult();
+        return user;
+    }
+
 }
