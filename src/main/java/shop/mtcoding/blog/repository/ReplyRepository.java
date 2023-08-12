@@ -24,7 +24,7 @@ public class ReplyRepository {
     public Reply findById(int id) {
         Query query = em.createNativeQuery("select * from reply_tb where id = :id", Reply.class);
         query.setParameter("id", id);
-        return (Reply) query.getSingleResult();
+        return (Reply) query.getResultList();
     }
 
     public List<Reply> findByBoardId(Integer boardId) {
